@@ -1,8 +1,8 @@
 # Author: @sleepy4k
 # License: MIT License
 # Description: A simple calculator app with Python.
-from logic import *
 import tkinter as tk
+from logic import create_calculator_gui
 
 # Configure the window
 title = "Calculator"
