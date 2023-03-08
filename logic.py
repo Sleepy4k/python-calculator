@@ -1,95 +1,65 @@
-import gui
-from tkinter import Entry
-from math import factorial, sin, cos, tan, exp
+def btn_click(item):
+    global expression
+    expression = expression + str(item)
+    input_text.set(expression)
 
-text_box = Entry(gui.frame, justify="center", font="Times 16 bold", width=30)
-text_box.grid(row = 0, column = 0,columnspan = 8,padx=30, pady = 30)
-text_box.insert(0, "0")
+def btn_clear():
+    global expression
+    expression = ""
+    input_text.set("")
 
-class Logic():
-    def __init__(self):
-        self.op = ""
-        self.total = 0
-        self.eq = False
-        self.current = ""
-        self.newNumber = True
-        self.opPending = False
+def btn_delete():
+    global expression
+    result = str(expression)[:-1]
+    input_text.set(result)
+    expression = result
 
-    def number_press(self, num):
-        self.eq = False
-        temp = text_box.get()
-        temp2 = str(num)
-        if self.newNumber:
-            self.current = temp2
-            self.newNumber = False
-        else:
-            if temp2 == '.':
-                if temp2 in temp:
-                    return
-            self.current = temp + temp2
-        self.display(self.current)
+def btn_equal():
+    global expression
+    result = str(eval(expression))
+    input_text.set(result)
+    expression = result
 
-    def sum_of_total(self):
-        self.eq = True
-        self.current = float(self.current)
-        if self.opPending:
-            self.do_sum()
-        else:
-            self.total = float(text_box.get())
+expression = ""
+input_text = ""
 
-    def do_sum(self):
-        if self.op == "add":
-            self.total += self.current
-        elif self.op == "minus":
-            self.total -= self.current
-        elif self.op == "times":
-            self.total *= self.current
-        elif self.op == "divide":
-            self.total /= self.current
-        elif self.op == "power":
-            self.total **= self.current
-        elif self.op == "mod":
-            self.total %= self.current
-        elif self.op == "log":
-            self.total = exp(self.current)
-        elif self.op == "sin":
-            self.total = sin(self.current)
-        elif self.op == "cos":
-            self.total = cos(self.current)
-        elif self.op == "tan":
-            self.total = tan(self.current)
-        elif self.op == "fact":
-            self.total = factorial(self.current)
-        self.newNumber = True
-        self.opPending = False
-        self.display(self.total)
+def create_calculator_gui(tk, root, size, title, input):
+    global input_text
+    input_text = input
+    
+    root.geometry(size)
+    root.resizable(0, 0)
+    root.title(title)
 
-    def operation(self, op):
-        self.current = float(self.current)
-        if self.opPending:
-            self.do_sum()
-        elif not self.eq:
-            self.total = self.current
-        self.newNumber = True
-        self.opPending = True
-        self.op = op
-        self.eq = False
+    input_frame = tk.Frame(root, width=312, height=50, bd=0, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+    input_frame.pack(side = tk.TOP)
 
-    def display(self, value):
-        text_box.delete(0, "end")
-        text_box.insert(0, value)
+    input_field = tk.Entry(input_frame, font=('arial', 30, 'bold'), textvariable=input_text, width=50, bg="#eee", bd=0, justify = tk.RIGHT)
+    input_field.grid(row=0, column=0)
+    input_field.pack(ipady=10)
 
-    def clear(self):
-        self.eq = False
-        self.current = "0"
-        self.display(0)
-        self.newNumber = True
+    btns_frame = tk.Frame(root, width=312, height=272.5, bg="grey")
+    btns_frame.pack()
 
-    def all_clear(self):
-        self.clear()
-        self.total = 0
+    clear = tk.Button(btns_frame, text="Clear", fg="black", width=22, height=3, bd=0, bg="#eee", cursor="hand2", command=lambda: btn_clear()).grid(row=0, column=0, columnspan=2, padx=1, pady=1)
+    delete = tk.Button(btns_frame, text="Delete", fg="black", width=10, height=3, bd=0, bg="#eee", cursor="hand2", command=lambda: btn_delete()).grid(row=0, column=2, padx=1, pady=1)
+    divide = tk.Button(btns_frame, text="/", fg="black", width=10, height=3, bd=0, bg="#eee", cursor="hand2", command=lambda: btn_click("/")).grid(row=0, column=3, padx=1, pady=1)
 
-    def sign(self):
-        self.eq = False
-        self.current = -(float(text_box.get()))
-        self.display(self.current)
+    seven = tk.Button(btns_frame, text="7", fg="black", width=10, height=3, bd=0, bg="#fff", cursor="hand2", command=lambda: btn_click(7)).grid(row=1, column=0, padx=1, pady=1)
+    eight = tk.Button(btns_frame, text="8", fg="black", width=10, height=3, bd=0, bg="#fff", cursor="hand2", command=lambda: btn_click(8)).grid(row=1, column=1, padx=1, pady=1)
+    nine = tk.Button(btns_frame, text="9", fg="black", width=10, height=3, bd=0, bg="#fff", cursor="hand2", command=lambda: btn_click(9)).grid(row=1, column=2, padx=1, pady=1)
+    multiply = tk.Button(btns_frame, text = "*", fg = "black", width = 10, height = 3, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click("*")).grid(row = 1, column = 3, padx = 1, pady = 1)
+
+    four = tk.Button(btns_frame, text = "4", fg = "black", width = 10, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(4)).grid(row = 2, column = 0, padx = 1, pady = 1)
+    five = tk.Button(btns_frame, text = "5", fg = "black", width = 10, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(5)).grid(row = 2, column = 1, padx = 1, pady = 1)
+    six = tk.Button(btns_frame, text = "6", fg = "black", width = 10, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(6)).grid(row = 2, column = 2, padx = 1, pady = 1)
+    minus = tk.Button(btns_frame, text = "-", fg = "black", width = 10, height = 3, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click("-")).grid(row = 2, column = 3, padx = 1, pady = 1)
+
+    one = tk.Button(btns_frame, text = "1", fg = "black", width = 10, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(1)).grid(row = 3, column = 0, padx = 1, pady = 1)
+    two = tk.Button(btns_frame, text = "2", fg = "black", width = 10, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(2)).grid(row = 3, column = 1, padx = 1, pady = 1)
+    three = tk.Button(btns_frame, text = "3", fg = "black", width = 10, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(3)).grid(row = 3, column = 2, padx = 1, pady = 1)
+    plus = tk.Button(btns_frame, text = "+", fg = "black", width = 10, height = 3, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click("+")).grid(row = 3, column = 3, padx = 1, pady = 1)
+
+    zero = tk.Button(btns_frame, text = "0", fg = "black", width = 21, height = 3, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(0)).grid(row = 4, column = 0, columnspan = 2, padx = 1, pady = 1)
+    point = tk.Button(btns_frame, text = ".", fg = "black", width = 10, height = 3, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click(".")).grid(row = 4, column = 2, padx = 1, pady = 1)
+    equals = tk.Button(btns_frame, text = "=", fg = "black", width = 10, height = 3, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_equal()).grid(row = 4, column = 3, padx = 1, pady = 1)
