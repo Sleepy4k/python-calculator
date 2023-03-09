@@ -1,88 +1,90 @@
-def btn_click(item):
-    global expression
-    expression = expression + str(item)
-    input_text.set(expression)
+# Author: @sleepy4k
+# License: MIT License
+# Description: A simple calculator app with Python.
+from tkinter import Button, Entry, Frame, StringVar
 
-def btn_clear():
-    global expression
-    expression = ""
-    input_text.set("")
+class Calculator:
+    def __init__(self, root, title, size, font_input, font_button):
+        self.expression = ""
+        self.input_text = StringVar()
+        self.allowed_buttons = [
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
+            ".", "+", "-", "*", "/", "(", ")", "C", "<-", "="
+        ]
+        self.root = root
+        self.root.geometry(f"{size[0]}x{size[1]}")
+        self.root.resizable(0, 0)
+        self.root.title(title)
+        self.bind_buttons()
+        self.create_gui(font_input, font_button)
 
-def btn_delete():
-    global expression
-    result = str(expression)[:-1]
-    input_text.set(result)
-    expression = result
+    def bind_buttons(self):
+        for button in self.allowed_buttons:
+            if button == "C":
+                self.root.bind("<Escape>", lambda event: self.clear())
+                self.root.bind("<Delete>", lambda event: self.clear())
+            elif button == "<-":
+                self.root.bind("<BackSpace>", lambda event: self.delete())
+            elif button == "=":
+                self.root.bind("<Return>", lambda event: self.calculate())
+            else:
+                self.root.bind(button, lambda event, btn=button: self.click(btn))
 
-def btn_equal():
-    global expression
-    result = str(eval(expression))
-    input_text.set(result)
-    expression = result
+    def create_gui(self, font_input, font_button):
+        input_frame = Frame(self.root, width=312, height=50, bd=0, highlightbackground="black", highlightcolor="black", highlightthickness=1)
+        input_frame.pack(side="top")
 
-def btn_bind(root):
-    root.bind("<Return>", lambda event: btn_equal())
-    root.bind("<BackSpace>", lambda event: btn_delete())
-    root.bind("<Escape>", lambda event: btn_clear())
-    root.bind("<Delete>", lambda event: btn_clear())
-    root.bind("9", lambda event: btn_click(9))
-    root.bind("8", lambda event: btn_click(8))
-    root.bind("7", lambda event: btn_click(7))
-    root.bind("6", lambda event: btn_click(6))
-    root.bind("5", lambda event: btn_click(5))
-    root.bind("4", lambda event: btn_click(4))
-    root.bind("3", lambda event: btn_click(3))
-    root.bind("2", lambda event: btn_click(2))
-    root.bind("1", lambda event: btn_click(1))
-    root.bind("0", lambda event: btn_click(0))
-    root.bind(".", lambda event: btn_click("."))
-    root.bind("+", lambda event: btn_click("+"))
-    root.bind("-", lambda event: btn_click("-"))
-    root.bind("*", lambda event: btn_click("*"))
-    root.bind("/", lambda event: btn_click("/"))
+        input_field = Entry(input_frame, font=font_input, textvariable=self.input_text, width=50, bg="#eee", bd=0, justify="right")
+        input_field.grid(row=0, column=0)
+        input_field.pack(ipady=10)
 
-expression = ""
-input_text = ""
+        btns_frame = Frame(self.root, width=312, height=272.5, bg="grey")
+        btns_frame.pack()
 
-def create_calculator_gui(tk, root, size, title, input, font_input, font_button):
-    global input_text
-    input_text = input
+        row = 1
+        col = 0
 
-    root.geometry(size)
-    root.resizable(0, 0)
-    root.title(title)
+        for button in self.allowed_buttons:
+            btn = Button(btns_frame, text=button, font=font_button, fg="black", width=6, height=2, bd=0, bg="#fff", cursor="hand2")
 
-    btn_bind(root)
+            self.root.rowconfigure(row, weight=1)
+            self.root.columnconfigure(col, weight=1)
 
-    input_frame = tk.Frame(root, width=312, height=50, bd=0, highlightbackground="black", highlightcolor="black", highlightthickness=1)
-    input_frame.pack(side = tk.TOP)
+            if button == "(":
+                btn.configure(command=lambda btn=button: self.click(btn))
+                btn.grid(row=0, column=0, padx=1, pady=1)
+            elif button == ")":
+                btn.configure(command=lambda btn=button: self.click(btn))
+                btn.grid(row=0, column=1, padx=1, pady=1)
+            elif button == "C":
+                btn.configure(command=self.clear)
+                btn.grid(row=0, column=2, padx=1, pady=1)
+            elif button == "<-":
+                btn.configure(command=self.delete)
+                btn.grid(row=0, column=3, padx=1, pady=1)
+            elif button == "=":
+                btn.configure(command=self.calculate)
+                btn.grid(row=4, column=3, padx=1, pady=1)
+            else:
+                btn.configure(command=lambda btn=button: self.click(btn))
+                btn.grid(row=row, column=col, padx=1, pady=1)
+            col += 1
+            if col > 3:
+                col = 0
+                row += 1
 
-    input_field = tk.Entry(input_frame, font=font_input, textvariable=input_text, width=50, bg="#eee", bd=0, justify = tk.RIGHT)
-    input_field.grid(row=0, column=0)
-    input_field.pack(ipady=10)
+    def click(self, btn):
+        self.expression += str(btn)
+        self.input_text.set(self.expression)
 
-    btns_frame = tk.Frame(root, width=312, height=272.5, bg="grey")
-    btns_frame.pack()
+    def clear(self):
+        self.expression = ""
+        self.input_text.set("")
 
-    clear = tk.Button(btns_frame, text="Clear", font=font_button, fg="black", width=13, height=2, bd=0, bg="#eee", cursor="hand2", command=lambda: btn_clear()).grid(row=0, column=0, columnspan=2, padx=1, pady=1)
-    delete = tk.Button(btns_frame, text="Delete", font=font_button, fg="black", width=6, height=2, bd=0, bg="#eee", cursor="hand2", command=lambda: btn_delete()).grid(row=0, column=2, padx=1, pady=1)
-    divide = tk.Button(btns_frame, text="/", font=font_button, fg="black", width=6, height=2, bd=0, bg="#eee", cursor="hand2", command=lambda: btn_click("/")).grid(row=0, column=3, padx=1, pady=1)
+    def delete(self):
+        self.expression = self.expression[:-1]
+        self.input_text.set(self.expression)
 
-    seven = tk.Button(btns_frame, text="7", font=font_button, fg="black", width=6, height=2, bd=0, bg="#fff", cursor="hand2", command=lambda: btn_click(7)).grid(row=1, column=0, padx=1, pady=1)
-    eight = tk.Button(btns_frame, text="8", font=font_button, fg="black", width=6, height=2, bd=0, bg="#fff", cursor="hand2", command=lambda: btn_click(8)).grid(row=1, column=1, padx=1, pady=1)
-    nine = tk.Button(btns_frame, text="9", font=font_button, fg="black", width=6, height=2, bd=0, bg="#fff", cursor="hand2", command=lambda: btn_click(9)).grid(row=1, column=2, padx=1, pady=1)
-    multiply = tk.Button(btns_frame, text = "*", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click("*")).grid(row = 1, column = 3, padx = 1, pady = 1)
-
-    four = tk.Button(btns_frame, text = "4", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(4)).grid(row = 2, column = 0, padx = 1, pady = 1)
-    five = tk.Button(btns_frame, text = "5", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(5)).grid(row = 2, column = 1, padx = 1, pady = 1)
-    six = tk.Button(btns_frame, text = "6", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(6)).grid(row = 2, column = 2, padx = 1, pady = 1)
-    minus = tk.Button(btns_frame, text = "-", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click("-")).grid(row = 2, column = 3, padx = 1, pady = 1)
-
-    one = tk.Button(btns_frame, text = "1", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(1)).grid(row = 3, column = 0, padx = 1, pady = 1)
-    two = tk.Button(btns_frame, text = "2", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(2)).grid(row = 3, column = 1, padx = 1, pady = 1)
-    three = tk.Button(btns_frame, text = "3", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(3)).grid(row = 3, column = 2, padx = 1, pady = 1)
-    plus = tk.Button(btns_frame, text = "+", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click("+")).grid(row = 3, column = 3, padx = 1, pady = 1)
-
-    zero = tk.Button(btns_frame, text = "0", font=font_button, fg = "black", width = 13, height = 2, bd = 0, bg = "#fff", cursor = "hand2", command = lambda: btn_click(0)).grid(row = 4, column = 0, columnspan = 2, padx = 1, pady = 1)
-    point = tk.Button(btns_frame, text = ".", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_click(".")).grid(row = 4, column = 2, padx = 1, pady = 1)
-    equals = tk.Button(btns_frame, text = "=", font=font_button, fg = "black", width = 6, height = 2, bd = 0, bg = "#eee", cursor = "hand2", command = lambda: btn_equal()).grid(row = 4, column = 3, padx = 1, pady = 1)
+    def calculate(self):
+        self.expression = str(eval(self.expression))
+        self.input_text.set(self.expression)
