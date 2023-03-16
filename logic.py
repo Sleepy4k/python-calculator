@@ -86,5 +86,8 @@ class Calculator:
         self.input_text.set(self.expression)
 
     def calculate(self):
-        self.expression = str(eval(self.expression))
+        try:
+            self.expression = str(eval(self.expression))
+        except ZeroDivisionError:
+            self.expression = "0"
         self.input_text.set(self.expression)
